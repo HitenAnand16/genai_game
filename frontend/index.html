@@ -175,17 +175,17 @@
             
             // Check if the result is 'yes' or 'no' and update UI accordingly
             if (data.result === 'yes') {
-                resultElement.classList.add('lose');
-                resultElement.classList.remove('win');
-                resultElement.innerText = "You Lose! (AI wins)";
-            } else if (data.result === 'no') {
                 resultElement.classList.add('win');
                 resultElement.classList.remove('lose');
-                resultElement.innerText = "You Win! (You defeated AI)";
+                resultElement.innerText = "You Won! (Your word beats AI's word)";
+            } else if (data.result === 'no') {
+                resultElement.classList.add('lose');
+                resultElement.classList.remove('win');
+                resultElement.innerText = "You Lost! (AI's word beats your word)";
             } else {
                 resultElement.classList.remove('win', 'lose');
-                resultElement.innerText = "Error in battle result.";
-            }
+                resultElement.innerText = "Error: Unable to determine battle result.";
+            }            
         }
         
         // Call the fetchAiWord function when the page loads
