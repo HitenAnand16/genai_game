@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Battle</title>
+    <style>
+        /* Reset some default browser styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            color: #333;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 350px;
+            max-width: 90%;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .container:hover {
+            transform: scale(1.05);
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #ff7e5f;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 18px;
+            color: #4CAF50;
+            transition: color 0.3s ease;
+        }
+
+        .result.win {
+            color: #4CAF50;
+        }
+
+        .result.lose {
+            color: #f44336;
+        }
+
+        input, button {
+            padding: 12px;
+            margin-top: 15px;
+            width: 100%;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            transition: border 0.3s ease;
+        }
+
+        input:focus, button:focus {
+            border: 2px solid #ff7e5f;
+        }
+
+        button {
+            background-color: #ff7e5f;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #ff5c47;
+        }
+
+        button:active {
+            background-color: #e14c3f;
+        }
+
+        .ai-word {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff7e5f;
+            margin-top: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .ai-word span {
+            color: #feb47b;
+        }
+
+        .container p {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Word Battle Game</h1>
+
+        <p><strong>AI Word:</strong> <span id="ai-word" class="ai-word">Loading...</span></p>
+
+        <input type="text" id="user-word" placeholder="Enter your word here" />
+
+        <button onclick="startBattle()">Battle!</button>
+
+        <div class="result" id="battle-result"></div>
+    </div>
+
+    <script>
+        // Fetch the AI-generated word when the page loads
+        async function fetchAiWord() {
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/generate-ai-word?timestamp=${new Date().getTime()}`);
+                if (!response.ok) throw new Error("Failed to fetch AI word");
+        
+                const data = await response.json();
+                console.log(data);  // Log to check the structure of the response
+        
+                // Ensure the response has ai_word and set it to the UI
+                if (data.ai_word) {
+                    document.getElementById('ai-word').innerText = data.ai_word;
+                } else {
+                    document.getElementById('ai-word').innerText = "Error: AI word not found";
+                }
+            } catch (error) {
+                document.getElementById('ai-word').innerText = "Error: Could not load AI word";
+            }
+        }
+        
+        // Call the fetchAiWord function when the page loads
+        window.onload = fetchAiWord;
+        
+        async function startBattle() {
+            const userWord = document.getElementById('user-word').value;
+            const aiWord = document.getElementById('ai-word').innerText;
+        
+            if (!userWord) {
+                alert("Please enter your word before starting the battle.");
+                return;
+            }
+        
+            const response = await fetch('http://127.0.0.1:8000/battle', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_word: userWord,
+                    ai_word: aiWord
+                })
+            });
+        
+            const data = await response.json();
+            const resultElement = document.getElementById('battle-result');
+            
+            // Check if the result is 'yes' or 'no' and update UI accordingly
+            if (data.result === 'yes') {
+                resultElement.classList.add('lose');
+                resultElement.classList.remove('win');
+                resultElement.innerText = "You Lose! (AI wins)";
+            } else if (data.result === 'no') {
+                resultElement.classList.add('win');
+                resultElement.classList.remove('lose');
+                resultElement.innerText = "You Win! (You defeated AI)";
+            } else {
+                resultElement.classList.remove('win', 'lose');
+                resultElement.innerText = "Error in battle result.";
+            }
+        }
+        
+        // Call the fetchAiWord function when the page loads
+        window.onload = fetchAiWord;
+    </script>
+
+</body>
+</html>
