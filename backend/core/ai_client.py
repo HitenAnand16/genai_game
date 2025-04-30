@@ -3,7 +3,7 @@ import json
 
 def query_llm(prompt):
     headers = {
-    "Authorization": f"Bearer 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",
+    "Authorization": f"Bearer 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",
     "Content-Type": "application/json"
     }
     payload = {

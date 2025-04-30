@@ -50,7 +50,7 @@ def battle_result(data: UserInput):
         # 3. Query the LLM
         prompt = (
         f"Who would likely win in a confrontation: '{data.ai_word}' or '{data.user_word}'? "
-        f"Start your response with 'Yes' if '{data.ai_word}' wins or 'No' if '{data.user_word}' wins, followed by reasoning. "
+        f"Start your response with 'No' if '{data.ai_word}' wins or 'Yes' if '{data.user_word}' wins, followed by reasoning. "
         f"Keep your reasoning brief and conclude your answer completely."
         )
 
